@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="UTF-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+      <script
+         src="https://code.jquery.com/jquery-3.6.1.min.js"
+         integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ="
+         crossorigin="anonymous"></script>
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+      <title>Ajax Method</title>
+      <link rel="stylesheet" type="text/css" href="./assets/css/style1.css">
+   </head>
+   <body>
+      <div class="container">
+         <div class="row">
+            <div class="col-md-3"></div>
+            <div class="col-md-6">
+               <form id="myform" onsubmit="return false" style=" border: 2px solid gray;">
+                  <h4 class="headers">Add employee Details</h4>
+                  <div class="mb-3 mt-3">
+                     <label>FirstName:</label>
+                     <input type="text" class="form-control input"  placeholder="Enter name" id="fname" required>
+                     <p id="uname" class="error"></p>
+                  </div>
+                  <div class="mb-3 mt-3">
+                     <label>LastName:</label>
+                     <input type="text" class="form-control input"  placeholder="Enter name" id="lname" required>
+                     <p id="uname" class="error"></p>
+                  </div>
+                  <div class="mb-3 mt-3">
+                     <label>Email:</label>
+                     <input type="email" class="form-control input" placeholder="Enter email" id="email" required>
+                     <p id="uemail" class="error"></p>
+                  </div>
+                  <div style="text-align:right;">
+                     <button type="submit" class="btn btn-primary" onclick="return addemployee()">Submit</button>
+                  </div>
+               </form>
+               <div class="col-md-3"></div>
+            </div>
+         </div>
+      </div>
+      <table>
+         <thead>
+            <tr>
+               <th>firstname</th>
+               <th>lastname</th>
+               <th>email</th>
+               <th>Edit</th>
+               <th>Delete</th>
+            </tr>
+         </thead>
+         <tbody id="data-output">
+            <!-- Prodcuts from javascript file in here. -->
+         </tbody>
+      </table>
+      <!-- model -->
+      <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+         <div class="modal-dialog" role="document">
+            <div class="modal-content">
+               <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                  <h4 class="modal-title" id="myModalLabel">Update User</h4>
+               </div>
+               <div class="modal-body">
+                  <form id="updateUser" method="post"  onsubmit="return false" style=" border: 2px solid gray;padding: 30px;">
+                     <input type="hidden" id="empId">
+                     <div class="mb-3 mt-3">
+                        <label>FirstName:</label>
+                        <input type="text" class="form-control input"  placeholder="Enter name" id="mfname" name="firstname" required>
+                        <p id="uname" class="error"></p>
+                     </div>
+                     <div class="mb-3 mt-3">
+                        <label>LastName:</label>
+                        <input type="text" class="form-control input"  placeholder="Enter name" id="mlname" name="lastname" required>
+                        <p id="uname" class="error"></p>
+                     </div>
+                     <div class="mb-3 mt-3">
+                        <label>Email:</label>
+                        <input type="email" class="form-control input" placeholder="Enter email" id="memail" name="email" required>
+                        <p id="uemail" class="error"></p>
+                     </div>
+                     <div style="text-align:right;">
+                        <button type="submit" class="btn btn-primary" onclick="updateemploye()">Submit</button>
+                     </div>
+                  </form>
+               </div>
+               <div class="modal-footer"></div>
+            </div>
+         </div>
+      </div>
+      <script src="https://cdn.jsdelivr.net/npm/axios@1.1.2/dist/axios.min.js"></script>
+      <!-- <script src="script.js"></script> -->
+      <script>
+         getemployes(false)
+         
+         function addemployee(){
+             let fname = document.getElementById("fname").value;
+             let lname = document.getElementById("lname").value;
+             let email = document.getElementById("email").value;
+             console.log("ghjkl",fname,lname,email)
+             if(fname!=""&&lname!=""&&email!=""){
+                 $.ajax({
+                     url: "http://localhost:3000/employees",
+                     type: 'post',
+                     data: {first_name:fname,last_name: lname,email: email},
+                     success: function(response){
+                         console.log("asdfg",response)
+                         getemployes(false)
+                     }
+                 })
+         
+             }
+         
+         }
+         function getemployes(status, callback){
+             $.ajax({
+                 url:"http://localhost:3000/employees",
+                 type:"get",
+                 success:function(response){
+                     if (status)return callback(response)
+                     else displayemploye(response)
+                     // console.log("asdfgh",status)
+                 }
+             })
+         }
+         
+         function displayemploye(employeesList){
+           console.log(employeesList)
+             let placeholder = document.querySelector("#data-output");
+             let out = "";
+             for(let employee of employeesList){
+                 out += `
+                 <tr>
+                     <td>${employee.first_name}</td>
+                     <td>${employee.last_name}</td>
+                     <td>${employee.email}</td>
+                     <td><button class='btn btn-primary' onclick="editemploye(${employee.id})">Edit</button></td>
+                     <td><button class='btn btn-danger' onclick="deleteemploye(${employee.id})">Delete</button></td>
+                  </tr>`;
+                
+             }
+              placeholder.innerHTML = out;
+         }
+         
+         function editemploye(id){
+             getemployes(true, function(response) {
+               console.log("sdefrgh",getemployes(true))
+             response.forEach(function(emp, i) {
+                 console.log("///////////",emp,email)
+                 if (emp.id == id) {
+                     $("#mfname").val(emp.first_name)
+                     $("#mlname").val(emp.last_name)
+                     $("#memail").val(emp.email)
+                     $('#empId').val(emp.id)
+                     $('#myModal').modal('show');
+                 }
+             })
+         })
+         }
+         
+         function updateemploye(){
+             var msg = "User updated successfully!";
+             let id = $('#empId').val()
+             getemployes(true, function(response) {
+               // console.log("&&&&&&&&&&&",response);
+                 response.forEach(function(empp, i) {
+                   // console.log("***",empp)
+                     if (empp.id == id) {
+                         let fname = $("#mfname").val()
+                         let lname = $("#mlname").val()
+                         let email = $("#memail").val()
+                         $.ajax({
+                             url: "http://localhost:3000/employees/"+id,
+                             type: 'put',
+                             data: {first_name:fname,last_name: lname,email: email},
+                             success: function(response){}
+                         })
+                         getemployes(false)
+                         $("#myModal").modal("toggle");
+                     }
+                 });
+         
+             })
+         } 
+         
+         function deleteemploye(id){
+           // alert("sdfghj")
+         
+           $.ajax({
+                 url: "http://localhost:3000/employees/"+id,
+                 type: 'delete',
+                 success: function(response){
+                   getemployes(false)
+                 }
+               })
+          
+         }
+      </script>
+   </body>
+</html>
